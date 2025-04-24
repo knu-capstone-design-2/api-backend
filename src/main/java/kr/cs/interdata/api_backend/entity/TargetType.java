@@ -1,4 +1,4 @@
-package kr.cs.interdata.consumer.entity;
+package kr.cs.interdata.api_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

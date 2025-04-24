@@ -1,6 +1,6 @@
-package kr.cs.interdata.consumer.repository;
+package kr.cs.interdata.api_backend.repository;
 
-import kr.cs.interdata.consumer.entity.MetricsByType;
+import kr.cs.interdata.api_backend.entity.MetricsByType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

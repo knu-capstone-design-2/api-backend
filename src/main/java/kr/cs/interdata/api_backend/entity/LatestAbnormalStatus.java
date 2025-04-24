@@ -1,4 +1,4 @@
-package kr.cs.interdata.consumer.entity;
+package kr.cs.interdata.api_backend.entity;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
