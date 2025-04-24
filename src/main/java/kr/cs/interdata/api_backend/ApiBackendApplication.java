@@ -1,4 +1,4 @@
-package com.example.api_backend;
+package kr.cs.interdata.api_backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

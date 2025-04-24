@@ -35,3 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### env ###
+.env
+/src/main/resources/properties/env.properties
+env.properties

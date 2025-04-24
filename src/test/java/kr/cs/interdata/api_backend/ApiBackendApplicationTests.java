@@ -1,4 +1,4 @@
-package com.example.api_backend;
+package kr.cs.interdata.api_backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
