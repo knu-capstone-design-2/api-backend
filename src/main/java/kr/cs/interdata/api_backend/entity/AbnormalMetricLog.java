@@ -24,9 +24,9 @@ public class AbnormalMetricLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer number;     // 누적 값
 
-    private String target_id;   // anomaly machine's id
+    private String targetId;   // anomaly machine's id
 
-    private String metric_name; // anomaly metric's name
+    private String metricName; // anomaly metric's name
     private Double value;       // outlier
     private LocalDateTime timestamp;    // anomaly가 생긴 시각
 }

@@ -24,9 +24,9 @@ public class MonitoredMachineInventory {
     private String id; // machine unique id (타입+숫자)
 
     @ManyToOne
-    @JoinColumn(name = "type_id")
+    @JoinColumn(name = "typeId")
     private TargetType type; // machine's 타입
 
-    private String machine_id; // machine id (host와 container별 생성된 고유 id)
+    private String machineId; // machine id (host와 container별 생성된 고유 id)
 
 }

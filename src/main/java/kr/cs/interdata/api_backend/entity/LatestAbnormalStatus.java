@@ -27,10 +27,10 @@ public class LatestAbnormalStatus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer number;     // unique id
 
-    private String target_id;   // anomaly machine's id
-    private String metric_name; // anomaly metric's name
+    private String targetId;   // anomaly machine's id
+    private String metricName; // anomaly metric's name
     private String value;       // outlier
-    private LocalDateTime detected_at;  // anomaly detection time
+    private LocalDateTime detectedAt;  // anomaly detection time
     private boolean resolved;   // 이상값이 해결되지 않았다면 false, 이상값이 해결되었다면 true로 update한다.
 
 }

@@ -1,8 +1,7 @@
 package kr.cs.interdata.api_backend.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * - table name : MetricsByType
@@ -20,6 +19,9 @@ import lombok.Setter;
 @Table(name = "MetricsByType")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MetricsByType {
 
     @Id
@@ -27,11 +29,11 @@ public class MetricsByType {
     private Integer number; // 누적 값
 
     @ManyToOne
-    @JoinColumn(name = "type_id")
+    @JoinColumn(name = "typeId")
     private TargetType type; // machine's 타입
 
-    private String metric_name; // 메트릭 이름
+    private String metricName; // 메트릭 이름
     private String unit; // 단위
-    private Double threshold_value; // 임계값
+    private Double thresholdValue; // 임계값
 
 }
