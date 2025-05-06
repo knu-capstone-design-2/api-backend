@@ -1,11 +1,11 @@
-package kr.cs.interdata.consumer.service;
+package kr.cs.interdata.api_backend.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.cs.interdata.consumer.entity.MetricsByType;
-import kr.cs.interdata.consumer.entity.TargetType;
-import kr.cs.interdata.consumer.repository.MetricsByTypeRepository;
-import kr.cs.interdata.consumer.repository.TargetTypeRepository;
+import kr.cs.interdata.api_backend.entity.MetricsByType;
+import kr.cs.interdata.api_backend.entity.TargetType;
+import kr.cs.interdata.api_backend.repository.MetricsByTypeRepository;
+import kr.cs.interdata.api_backend.repository.TargetTypeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,18 +35,19 @@ public class MonitoringDefinitionService {
 
     // 타입 등록 - targetType
     public void registerType(String type) {
-        TargetType targetType = null;
+        TargetType targetType = new TargetType();
         targetType.setType(type);
         targetTypeRepository.save(targetType);
 
         logger.info("Register type "+type+" successfully.");
     }
 
+    // 새로운 메트릭 등록
     public void saveMetric(String metricName, String unit, Double threshold){
-        MetricsByType metric = null;
-        metric.setMetric_name(metricName);
+        MetricsByType metric = new MetricsByType();
+        metric.setMetricName(metricName);
         metric.setUnit(unit);
-        metric.setThreshold_value(threshold);
+        metric.setThresholdValue(threshold);
         metricsByTypeRepository.save(metric);
 
         logger.info("Save new metric : " + metricName + "(" + unit + ")");

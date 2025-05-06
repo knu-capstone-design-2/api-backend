@@ -1,5 +1,6 @@
 package kr.cs.interdata.api_backend.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,33 +12,39 @@ import kr.cs.interdata.api_backend.dto.*;
 import kr.cs.interdata.api_backend.service.ThresholdService;
 
 @RestController
-@RequestMapping("/api/metrics")
+@RequestMapping("/api")
 public class ThresholdController {
 
     private final ThresholdService thresholdService;
 
+    @Autowired
     public ThresholdController(ThresholdService thresholdService) {
         this.thresholdService = thresholdService;
     }
 
-    @GetMapping("/threshold-setting")
+    @GetMapping("/metrics/threshold-setting")
     public ResponseEntity<?> getThreshold() {
         return ResponseEntity.ok(thresholdService.getThreshold());
     }
 
-    @PostMapping("/threshold-setting")
+    @PostMapping("/metrics/threshold-setting")
     public ResponseEntity<?> setThreshold(@RequestBody ThresholdSetting dto) {
         return ResponseEntity.ok(thresholdService.setThreshold(dto));
     }
 
-    @PostMapping("/threshold-history")
+    @PostMapping("/metrics/threshold-history")
     public ResponseEntity<?> getThresholdHistory(@RequestBody DateforHistory date) {
         return ResponseEntity.ok(thresholdService.getThresholdHistory(date));
     }
 
-    @PostMapping("/threshold-check")
-    public ResponseEntity<?> checkThreshold(@RequestBody ThresholdCheck dto) {
-        return ResponseEntity.ok(thresholdService.checkThreshold(dto));
+    @GetMapping("/metrics/threshold-check")
+    public ResponseEntity<?> checkThreshold() {
+        return ResponseEntity.ok(thresholdService.checkThreshold());
+    }
+
+    @PostMapping("/violation-store")
+    public ResponseEntity<?> storeViolation(@RequestBody StoreViolation dto) {
+        return ResponseEntity.ok(thresholdService.storeViolation(dto));
     }
 
 }
