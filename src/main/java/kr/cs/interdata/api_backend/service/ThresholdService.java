@@ -60,8 +60,7 @@ public class ThresholdService {
      *      ex. <host, <cpu, 80.0>>, <container,<memory,95.0>>, ...
      */
     public Object checkThreshold() {
-        // Map을 선언한다.
-        // Key는 'host' 또는 'container', Value는 해당 타입에 대한 메트릭들.
+        // Key는 'host' 또는 'container', Value는 해당 타입에 대한 메트릭들에 대한 Map을 선언한다.
         Map<String, Map<String, Double>> resultMap = new ConcurrentHashMap<>();
 
         // 모든 MetricsByType 데이터를 가져옴.
@@ -76,6 +75,7 @@ public class ThresholdService {
             Map<String, Double> metricMap = resultMap.getOrDefault(typeKey, new ConcurrentHashMap<>());
             metricMap.put(metric.getMetricName(), metric.getThresholdValue());
 
+            //결과 Map
             resultMap.put(typeKey, metricMap);
         }
 
