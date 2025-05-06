@@ -95,10 +95,10 @@ public class ThresholdService {
      *        - value    : 임계값을 넘은 값
      *        - timestamp: 임계값을 넘은 시각
      */
-    public String storeViolation(StoreViolation dto) {
+    public Object storeViolation(StoreViolation dto) {
         //이상값이 생긴 로그를 저장한다.
         abnormalDtectionService.storeViolation(
-                dto.getMachineId(),
+                dto.getTypeId(),
                 dto.getMetric(),
                 dto.getValue(),
                 dto.getTimestamp()
