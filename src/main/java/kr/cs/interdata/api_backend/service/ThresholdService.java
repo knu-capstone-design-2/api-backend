@@ -28,70 +28,42 @@ public class ThresholdService {
     private final Logger logger = LoggerFactory.getLogger(ThresholdService.class);
 
     private final AbnormalDetectionService abnormalDetectionService;
-    private final MetricsByTypeRepository metricsByTypeRepository;
+    private final MonitoringDefinitionService monitoringDefinitionService;
 
     @Autowired
     public ThresholdService(AbnormalDetectionService abnormalDetectionService,
-                            MetricsByTypeRepository metricsByTypeRepository) {
+                            MonitoringDefinitionService monitoringDefinitionService) {
         this.abnormalDetectionService = abnormalDetectionService;
-        this.metricsByTypeRepository = metricsByTypeRepository;
+        this.monitoringDefinitionService = monitoringDefinitionService;
     }
 
-    // 1. 현재 설정된 임계값을 조회
+    /**
+     *  1. 현재 설정된 임계값을 조회
+     * @return  각 메트릭의 임계값을 담은 데이터를 리턴한다.
+     */
     public ThresholdSetting getThreshold() {
-        List<MetricsByType> hostMetrics = metricsByTypeRepository.findByType_Type("host");
-
-        // 새로운 ThresholdSetting 객체 생성
-        ThresholdSetting thresholdSetting = new ThresholdSetting();
-
-        // 각 메트릭 이름에 따라 매핑
-        for (MetricsByType metric : hostMetrics) {
-            switch (metric.getMetricName()) {
-                case "cpu":
-                    thresholdSetting.setCpuPercent(metric.getThresholdValue().toString());
-                    break;
-                case "memory":
-                    thresholdSetting.setMemoryPercent(metric.getThresholdValue().toString());
-                    break;
-                case "disk":
-                    thresholdSetting.setDiskPercent(metric.getThresholdValue().toString());
-                    break;
-                case "network":
-                    thresholdSetting.setNetworkTraffic(metric.getThresholdValue().toString());
-                    break;
-                default:
-                    break;
-            }
-        }
-        return thresholdSetting;
+        /*
+         * "container"와 "host" 타입의 임계값은 같으므로
+         * "host" 타입의 임계값을 조회해 가져온다.
+         */
+        return monitoringDefinitionService.findThresholdByType("host");
     }
 
-    // 2. 새로운 임계값을 설정
+    /**
+     *  2. 새로운 임계값을 설정
+     * @param dto   각 메트릭의 threshold값
+     * @return  ok 메세지를 보낸다.
+     */
     public Map<String, String> setThreshold(ThresholdSetting dto) {
-        // CPU 임계값 업데이트
-        List<MetricsByType> cpuMetrics = metricsByTypeRepository.findByMetricName("cpu");
-        cpuMetrics.forEach(metric -> metric.setThresholdValue(Double.valueOf(dto.getCpuPercent())));
-        metricsByTypeRepository.saveAll(cpuMetrics);
-
-        // Memory 임계값 업데이트
-        List<MetricsByType> memoryMetrics = metricsByTypeRepository.findByMetricName("memory");
-        memoryMetrics.forEach(metric -> metric.setThresholdValue(Double.valueOf(dto.getMemoryPercent())));
-        metricsByTypeRepository.saveAll(memoryMetrics);
-
-        // Disk 임계값 업데이트
-        List<MetricsByType> diskMetrics = metricsByTypeRepository.findByMetricName("disk");
-        diskMetrics.forEach(metric -> metric.setThresholdValue(Double.valueOf(dto.getDiskPercent())));
-        metricsByTypeRepository.saveAll(diskMetrics);
-
-        // Network Traffic 임계값 업데이트
-        List<MetricsByType> networkMetrics = metricsByTypeRepository.findByMetricName("network");
-        networkMetrics.forEach(metric -> metric.setThresholdValue(Double.valueOf(dto.getNetworkTraffic())));
-        metricsByTypeRepository.saveAll(networkMetrics);
+        // 각 메트릭에 대한 임계값 업데이트
+        monitoringDefinitionService.updateThresholdByMetricName("cpu", Double.parseDouble(dto.getCpuPercent()));
+        monitoringDefinitionService.updateThresholdByMetricName("memory", Double.parseDouble(dto.getMemoryPercent()));
+        monitoringDefinitionService.updateThresholdByMetricName("disk", Double.parseDouble(dto.getDiskPercent()));
+        monitoringDefinitionService.updateThresholdByMetricName("network", Double.parseDouble(dto.getNetworkTraffic()));
 
         // 응답 생성
         Map<String, String> response = new HashMap<>();
         response.put("message", "ok");
-
         return response;
     }
 
