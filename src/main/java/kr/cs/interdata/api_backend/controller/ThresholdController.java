@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import kr.cs.interdata.api_backend.dto.*;
 import kr.cs.interdata.api_backend.service.ThresholdService;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/api")
@@ -45,6 +46,11 @@ public class ThresholdController {
     @PostMapping("/violation-store")
     public ResponseEntity<?> storeViolation(@RequestBody StoreViolation dto) {
         return ResponseEntity.ok(thresholdService.storeViolation(dto));
+    }
+
+    @GetMapping("/metrics/threshold-alert")
+    public SseEmitter alertThreshold() {
+        return thresholdService.alertThreshold();
     }
 
 }

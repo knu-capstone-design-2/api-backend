@@ -21,16 +21,13 @@ public class MonitoringDefinitionService {
     private final Logger logger = LoggerFactory.getLogger(MonitoringDefinitionService.class);
     private final TargetTypeRepository targetTypeRepository;
     private final MetricsByTypeRepository metricsByTypeRepository;
-    private final ObjectMapper objectMapper;
 
     @Autowired
     public MonitoringDefinitionService(
             TargetTypeRepository targetTypeRepository,
-            MetricsByTypeRepository metricsByTypeRepository,
-            ObjectMapper objectMapper) {
+            MetricsByTypeRepository metricsByTypeRepository) {
         this.targetTypeRepository = targetTypeRepository;
         this.metricsByTypeRepository = metricsByTypeRepository;
-        this.objectMapper = objectMapper;
     }
 
     // 타입 등록 - targetType
@@ -39,7 +36,7 @@ public class MonitoringDefinitionService {
         targetType.setType(type);
         targetTypeRepository.save(targetType);
 
-        logger.info("Register type "+type+" successfully.");
+        logger.info("Register type {} successfully.", type);
     }
 
     // 새로운 메트릭 등록
@@ -50,7 +47,7 @@ public class MonitoringDefinitionService {
         metric.setThresholdValue(threshold);
         metricsByTypeRepository.save(metric);
 
-        logger.info("Save new metric : " + metricName + "(" + unit + ")");
+        logger.info("Save new metric : {}({})", metricName, unit);
     }
 
     // 새로 받아올 메트릭 저장 - metricsbytype

@@ -32,14 +32,14 @@ public class DataInitializer implements CommandLineRunner {
 
         // 이미 저장된 메트릭은 중복 방지
         insertMetricIfNotExists(hostType, "cpu", "%", 80.0);
-        insertMetricIfNotExists(hostType, "memory", "%", 80.0);
-        insertMetricIfNotExists(hostType, "disk", "%", 90.0);
-        insertMetricIfNotExists(hostType, "network", "bytes/sec", 100000.0);
+        insertMetricIfNotExists(hostType, "memory", "bytes", 100000.0);
+        insertMetricIfNotExists(hostType, "disk", "bytes", 100000.0);
+        insertMetricIfNotExists(hostType, "network", "bytes", 100000.0);
 
-        insertMetricIfNotExists(containerType, "cpu", "%", 70.0);
-        insertMetricIfNotExists(containerType, "memory", "%", 70.0);
-        insertMetricIfNotExists(containerType, "disk", "%", 85.0);
-        insertMetricIfNotExists(containerType, "network", "bytes/sec", 50000.0);
+        insertMetricIfNotExists(containerType, "cpu", "%", 80.0);
+        insertMetricIfNotExists(containerType, "memory", "bytes", 100000.0);
+        insertMetricIfNotExists(containerType, "disk", "bytes", 100000.0);
+        insertMetricIfNotExists(containerType, "network", "bytes", 100000.0);
     }
 
     // 만약 type+name인 정보가 MetricsByType 테이블에 존재하지 않는다면 초기 정보를 넣는 메서드

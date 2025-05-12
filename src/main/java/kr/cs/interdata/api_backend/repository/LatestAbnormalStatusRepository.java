@@ -7,5 +7,7 @@ import java.util.Optional;
 
 public interface LatestAbnormalStatusRepository extends JpaRepository<LatestAbnormalStatus, Integer> {
 
+    // 해당되는 Metric이름과 targetId를 가진 row를 찾음.
     Optional<LatestAbnormalStatus> findByTargetIdAndMetricName(String targetId, String metricName);
+
 }
