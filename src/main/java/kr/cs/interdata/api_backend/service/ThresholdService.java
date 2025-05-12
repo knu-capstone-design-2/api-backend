@@ -30,11 +30,15 @@ public class ThresholdService {
     private final AbnormalDetectionService abnormalDetectionService;
     private final MonitoringDefinitionService monitoringDefinitionService;
 
+    private final MetricsByTypeRepository metricsByTypeRepository;
+
     @Autowired
     public ThresholdService(AbnormalDetectionService abnormalDetectionService,
-                            MonitoringDefinitionService monitoringDefinitionService) {
+                            MonitoringDefinitionService monitoringDefinitionService,
+                            MetricsByTypeRepository metricsByTypeRepository) {
         this.abnormalDetectionService = abnormalDetectionService;
         this.monitoringDefinitionService = monitoringDefinitionService;
+        this.metricsByTypeRepository = metricsByTypeRepository;
     }
 
     /**
@@ -92,34 +96,14 @@ public class ThresholdService {
 
     /**
      *  4. threshold 조회
-     *  -> MetricsByType 테이블의 모든 값을 조회해, 
+     *  -> MetricsByType 테이블의 모든 값을 조회해,
      *      모든 타입의 모든 metric의 threshold를 Map의 형태로 저장하여 return한다.
-     * 
+     *
      * @return Map<type(String), Map<metric_name(String), threshold(Double)>> resultMap
-     *      ex. <host, <cpu, 80.0>>, <container,<memory,95.0>>, ...
      */
-    public Object checkThreshold() {
-        // Key는 'host' 또는 'container', Value는 해당 타입에 대한 메트릭들에 대한 Map을 선언한다.
-        Map<String, Map<String, Double>> resultMap = new ConcurrentHashMap<>();
-
-        // 모든 MetricsByType 데이터를 가져옴.
-        List<MetricsByType> metricsList = metricsByTypeRepository.findAll();
-
-        // 데이터를 순차적으로 처리하여 결과 Map에 추가한다.
-        for (MetricsByType metric : metricsList) {
-            // type (host 또는 container)을 key로 사용
-            String typeKey = metric.getType().getType();
-
-            // 메트릭 이름과 threshold 값을 Map에 추가
-            Map<String, Double> metricMap = resultMap.getOrDefault(typeKey, new ConcurrentHashMap<>());
-            metricMap.put(metric.getMetricName(), metric.getThresholdValue());
-
-            //결과 Map
-            resultMap.put(typeKey, metricMap);
-        }
-
-        // 최종적으로 resultMap을 반환
-        return resultMap;
+    public Map<String, Map<String, Double>> checkThreshold() {
+        // MonitoringDefinitionService에서 조회
+        return monitoringDefinitionService.findAllThresholdsGroupedByType();
     }
 
     /**
@@ -187,7 +171,7 @@ public class ThresholdService {
         try {
             jsonData = objectMapper.writeValueAsString(alert);
         } catch (IOException e) {
-            // 🔸 변환에 실패하면 로깅만 하고 기본 메시지 설정
+            // 변환에 실패하면 로깅만 하고 기본 메시지 설정
             logger.error("Failed to convert AlertThreshold to JSON. Sending default error message.", e);
             jsonData = "{\"error\": \"Failed to convert AlertThreshold to JSON\"}";
         }

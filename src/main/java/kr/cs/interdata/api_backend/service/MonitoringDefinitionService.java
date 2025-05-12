@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -102,6 +104,28 @@ public class MonitoringDefinitionService {
         metricsByTypeRepository.saveAll(metrics);
 
         logger.info("Updated threshold for {} metrics to {}", metricName, thresholdValue);
+    }
+
+    /**
+     * 모든 타입의 모든 메트릭 임계값을 조회하여 Map 형태로 반환
+     *
+     * @return Map<type(String), Map<metric_name(String), threshold(Double)>> resultMap
+     */
+    public Map<String, Map<String, Double>> findAllThresholdsGroupedByType() {
+        // Key는 'host' 또는 'container', Value는 해당 타입에 대한 메트릭들에 대한 Map을 선언한다.
+        Map<String, Map<String, Double>> resultMap = new ConcurrentHashMap<>();
+
+        // 모든 MetricsByType 데이터를 가져옴
+        List<MetricsByType> metricsList = metricsByTypeRepository.findAll();
+
+        // 데이터를 순차적으로 처리하여 결과 Map에 추가한다.
+        metricsList.forEach(metric -> {
+            String typeKey = metric.getType().getType(); // type (host, container)
+            Map<String, Double> metricMap = resultMap.computeIfAbsent(typeKey, k -> new ConcurrentHashMap<>());
+            metricMap.put(metric.getMetricName(), metric.getThresholdValue());
+        });
+
+        return resultMap;
     }
 
 }
