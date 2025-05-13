@@ -27,7 +27,7 @@ public class LatestAbnormalStatus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer number;     // unique id
 
-    private String targetId;   // anomaly machine's id
+    private String targetId;   // anomaly machine's unique id
     private String metricName; // anomaly metric's name
     private String value;       // outlier
     private LocalDateTime detectedAt;  // anomaly detection time

@@ -35,6 +35,8 @@ dependencies {
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation 'com.github.ben-manes.caffeine:caffeine:3.2.0'
 }
 
 tasks.named('test') {

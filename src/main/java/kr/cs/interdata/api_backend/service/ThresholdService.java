@@ -1,6 +1,7 @@
 package kr.cs.interdata.api_backend.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,16 +30,15 @@ public class ThresholdService {
 
     private final AbnormalDetectionService abnormalDetectionService;
     private final MonitoringDefinitionService monitoringDefinitionService;
-
-    private final MetricsByTypeRepository metricsByTypeRepository;
+    private final MachineInventoryService machineInventoryService;
 
     @Autowired
     public ThresholdService(AbnormalDetectionService abnormalDetectionService,
                             MonitoringDefinitionService monitoringDefinitionService,
-                            MetricsByTypeRepository metricsByTypeRepository) {
+                            MachineInventoryService machineInventoryService) {
         this.abnormalDetectionService = abnormalDetectionService;
         this.monitoringDefinitionService = monitoringDefinitionService;
-        this.metricsByTypeRepository = metricsByTypeRepository;
+        this.machineInventoryService = machineInventoryService;
     }
 
     /**
@@ -107,10 +107,10 @@ public class ThresholdService {
     }
 
     /**
-     *  5. threshold 조회
-     *    -> consumer에서 임계값을 조회해 임계값을 넘어선 데이터가 있을 시,
+     *  5. threshold를 넘은 값이 생길 시 이를 처리하는 메서드
+     *    -> consumer에서 임계값을 조회해 이 프로젝트로 넘어왔을 때, 이는 임계값을 넘은 값이고,
      *          1. 이를 db에 저장한다.
-     *          2. 이를
+     *          2. 이를 sse방식으로 실시간 전송하는 메서드를 불러온다.
      *    -> db : AbnormalMetricLog, LatestAbnormalStatus
      * @param dto
      *        - typeId     : 메시지를 보낸 호스트
@@ -120,18 +120,26 @@ public class ThresholdService {
      */
     public Object storeViolation(StoreViolation dto) {
         //이상값이 생긴 로그를 저장한다.
+        String machineId = dto.getTargetId();
+        String metricName = dto.getMetricName();
+        String value = dto.getValue();
+        LocalDateTime timestamp = dto.getTimestamp();
+
+        // machine_id로 넘어온 id를 고유id로 바꿔 저장한다.
+        String targetId = machineInventoryService.changeMachineIdToTargetId(machineId);
+
         abnormalDetectionService.storeViolation(
-                dto.getTargetId(),
-                dto.getMetricName(),
-                dto.getValue(),
-                dto.getTimestamp()
+                targetId,
+                metricName,
+                value,
+                timestamp
         );
 
         AlertThreshold alert = new AlertThreshold();
-        alert.setTargetId(dto.getTargetId());
-        alert.setMetricName(dto.getMetricName());
-        alert.setValue(dto.getValue());
-        alert.setTimestamp(dto.getTimestamp());
+        alert.setTargetId(targetId);
+        alert.setMetricName(metricName);
+        alert.setValue(value);
+        alert.setTimestamp(timestamp);
 
         // 실시간 전송
         publishThreshold(alert);
