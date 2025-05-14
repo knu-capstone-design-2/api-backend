@@ -120,13 +120,14 @@ public class ThresholdService {
      */
     public Object storeViolation(StoreViolation dto) {
         //이상값이 생긴 로그를 저장한다.
+        String type = dto.getType();
         String machineId = dto.getMachineId();
         String metricName = dto.getMetricName();
         String value = dto.getValue();
         LocalDateTime timestamp = dto.getTimestamp();
 
         // machine_id로 넘어온 id를 고유id로 바꿔 저장한다.
-        String targetId = machineInventoryService.changeMachineIdToTargetId(machineId);
+        String targetId = machineInventoryService.changeMachineIdToTargetId(type, machineId);
 
         abnormalDetectionService.storeViolation(
                 targetId,

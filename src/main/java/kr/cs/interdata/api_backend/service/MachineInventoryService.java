@@ -29,17 +29,42 @@ public class MachineInventoryService {
     /**
      * machineId를 기반으로 MonitoredMachineInventory 테이블에서 조회하여
      * targetId (해당 엔티티의 id 값)를 반환한다.
+     * 조회 결과가 없을 경우 addMachine(String type, String machine_id)를 호출하여
+     * DB에 추가한 후 생성된 id를 반환한다.
      *
+     * @param type 추가할 machine의 타입
      * @param machineId 조회할 machine의 고유 ID
-     * @return 해당 machine의 targetId (없으면 null 반환)
+     * @return 해당 machine의 targetId (없으면 add 후 생성된 id 반환)
      */
-    public String changeMachineIdToTargetId(String machineId) {
+    public String changeMachineIdToTargetId(String type, String machineId) {
         // machineId를 기반으로 MonitoredMachineInventory 조회
         Optional<MonitoredMachineInventory> machineInventory =
                 monitoredMachineInventoryRepository.findByMachineId(machineId);
 
-        // 조회 결과가 있을 경우 id 반환, 없으면 null 반환
-        return machineInventory.map(MonitoredMachineInventory::getId).orElse(null);
+        // 조회 결과가 있을 경우 id 반환, 없으면 addMachine 호출 후 생성된 id 반환
+        return machineInventory.map(MonitoredMachineInventory::getId)
+                .orElseGet(() -> {
+                    addMachine(type, machineId);
+                    return monitoredMachineInventoryRepository.findByMachineId(machineId)
+                            .map(MonitoredMachineInventory::getId)
+                            .orElse(null); // 만약 add 후에도 조회가 안 되면 null 반환
+                });
+    }
+
+    // 머신 등록 - add
+    public void addMachine(String type, String machine_id) {
+        TargetType targetType = new TargetType();
+        targetType.setType(type);
+
+        MonitoredMachineInventory machine = new MonitoredMachineInventory();
+        String id = generateNextId(type);
+        machine.setId(id);
+        machine.setType(targetType);
+        machine.setMachineId(machine_id);
+
+        monitoredMachineInventoryRepository.save(machine);
+
+        logger.info("머신을 성공적으로 등록하였습니다: {} -> {}, {}", id, type, machine_id);
     }
 
     // type당 고유 id를 순서대로 생성하는 메서드(ex. host001, container002)
@@ -59,22 +84,6 @@ public class MachineInventoryService {
         }
 
         return String.format("%s%03d", type, nextNumber); // host004
-    }
-
-    // 머신 등록 - add
-    public void addMachine(String type, String machine_id) {
-        TargetType targetType = new TargetType();
-        targetType.setType(type);
-
-        MonitoredMachineInventory machine = new MonitoredMachineInventory();
-        String id = generateNextId(type);
-        machine.setId(id);
-        machine.setType(targetType);
-        machine.setMachineId(machine_id);
-
-        monitoredMachineInventoryRepository.save(machine);
-
-        logger.info("머신을 성공적으로 등록하였습니다: {} -> {}, {}", id, type, machine_id);
     }
 
     // 머신 모든 숫자 조회

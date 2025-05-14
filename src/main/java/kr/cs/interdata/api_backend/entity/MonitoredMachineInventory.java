@@ -27,6 +27,6 @@ public class MonitoredMachineInventory {
     @JoinColumn(name = "typeId")
     private TargetType type; // machine's 타입
 
-    private String machineId; // machine id (host와 container별 생성된 고유 id)
+    private String machineId; // machine id (host와 container별 생성된 머신 id)
 
 }
