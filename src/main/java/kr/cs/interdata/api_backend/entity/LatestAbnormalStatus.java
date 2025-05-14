@@ -1,6 +1,8 @@
 package kr.cs.interdata.api_backend.entity;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,9 +29,10 @@ public class LatestAbnormalStatus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer number;     // unique id
 
-    private String targetId;   // anomaly machine's id
+    private String targetId;   // anomaly machine's unique id
     private String metricName; // anomaly metric's name
     private String value;       // outlier
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime detectedAt;  // anomaly detection time
     private boolean resolved;   // 이상값이 해결되지 않았다면 false, 이상값이 해결되었다면 true로 update한다.
 

@@ -1,6 +1,8 @@
 package kr.cs.interdata.api_backend.entity;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,5 +30,6 @@ public class AbnormalMetricLog {
 
     private String metricName; // anomaly metric's name
     private Double value;       // outlier
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime timestamp;    // anomaly가 생긴 시각
 }

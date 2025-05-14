@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class MachineInventoryService {
@@ -22,6 +24,22 @@ public class MachineInventoryService {
     @Autowired
     public MachineInventoryService(MonitoredMachineInventoryRepository monitoredMachineInventoryRepository) {
         this.monitoredMachineInventoryRepository = monitoredMachineInventoryRepository;
+    }
+
+    /**
+     * machineId를 기반으로 MonitoredMachineInventory 테이블에서 조회하여
+     * targetId (해당 엔티티의 id 값)를 반환한다.
+     *
+     * @param machineId 조회할 machine의 고유 ID
+     * @return 해당 machine의 targetId (없으면 null 반환)
+     */
+    public String changeMachineIdToTargetId(String machineId) {
+        // machineId를 기반으로 MonitoredMachineInventory 조회
+        Optional<MonitoredMachineInventory> machineInventory =
+                monitoredMachineInventoryRepository.findByMachineId(machineId);
+
+        // 조회 결과가 있을 경우 id 반환, 없으면 null 반환
+        return machineInventory.map(MonitoredMachineInventory::getId).orElse(null);
     }
 
     // type당 고유 id를 순서대로 생성하는 메서드(ex. host001, container002)

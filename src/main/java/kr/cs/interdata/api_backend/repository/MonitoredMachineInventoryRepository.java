@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MonitoredMachineInventoryRepository extends JpaRepository<MonitoredMachineInventory, String> {
 
@@ -24,5 +25,8 @@ public interface MonitoredMachineInventoryRepository extends JpaRepository<Monit
             "WHERE m.type = :type AND m.id IS NOT NULL " +
             "ORDER BY m.id DESC")
     List<String> findTopIdByType(@Param("type") String type, Pageable pageable);
+
+    // machine id를 통해 id를 반환하는 메서드
+    Optional<MonitoredMachineInventory> findByMachineId(String machineId);
 
 }
