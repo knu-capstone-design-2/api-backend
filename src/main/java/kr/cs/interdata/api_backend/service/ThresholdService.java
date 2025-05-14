@@ -7,13 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.cs.interdata.api_backend.dto.*;
 import kr.cs.interdata.api_backend.entity.AbnormalMetricLog;
-import kr.cs.interdata.api_backend.entity.MetricsByType;
-import kr.cs.interdata.api_backend.repository.MetricsByTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ public class ThresholdService {
 
     // 클라이언트의 Emitter를 저장할 ConcurrentHashMap
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+    @Autowired
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Logger logger = LoggerFactory.getLogger(ThresholdService.class);
 
@@ -110,7 +110,7 @@ public class ThresholdService {
      *  5. threshold를 넘은 값이 생길 시 이를 처리하는 메서드
      *    -> consumer에서 임계값을 조회해 이 프로젝트로 넘어왔을 때, 이는 임계값을 넘은 값이고,
      *          1. 이를 db에 저장한다.
-     *          2. 이를 sse방식으로 실시간 전송하는 메서드를 불러온다.
+     *          2. 이를 sse방식으로 실시간 전송하는 메서드(6-2)를 호출한다.
      *    -> db : AbnormalMetricLog, LatestAbnormalStatus
      * @param dto
      *        - typeId     : 메시지를 보낸 호스트
@@ -120,7 +120,7 @@ public class ThresholdService {
      */
     public Object storeViolation(StoreViolation dto) {
         //이상값이 생긴 로그를 저장한다.
-        String machineId = dto.getTargetId();
+        String machineId = dto.getMachineId();
         String metricName = dto.getMetricName();
         String value = dto.getValue();
         LocalDateTime timestamp = dto.getTimestamp();
@@ -135,21 +135,22 @@ public class ThresholdService {
                 timestamp
         );
 
+        // 실시간 전송 준비
         AlertThreshold alert = new AlertThreshold();
         alert.setTargetId(targetId);
         alert.setMetricName(metricName);
         alert.setValue(value);
         alert.setTimestamp(timestamp);
 
-        // 실시간 전송
-        publishThreshold(alert);
+        // 실시간 전송 (비동기 처리)
+        CompletableFuture.runAsync(() -> publishThreshold(alert));
 
         //단, request에 대한 응답값은 없다.
         return "ok";
     }
 
     /**
-     *  6. sse방식을 사용하기 위해 비동기로 emitter를 연결한다.
+     *  6-1. sse방식을 사용하기 위해 비동기로 emitter를 연결한다.
      *  -> SSE 연결을 생성하고 Emitter를 관리한다.
      *
      * @return emitter 연결
@@ -171,8 +172,12 @@ public class ThresholdService {
         return emitter;
     }
 
+
     /**
-     * 임계값을 초과한 데이터가 발생하면 실시간으로 전송한다.
+     *  6-2. 임계값을 초과한 데이터가 발생하면 실시간으로 전송한다.
+     *      -> 이상값이 생길 시, 5번 메서드와 함께 데이터를 처리하며 실행된다.
+     *
+     * @param alert     실시간 전송할 임계치를 넘은 데이터
      */
     public void publishThreshold(AlertThreshold alert) {
         String jsonData;
@@ -184,7 +189,7 @@ public class ThresholdService {
             jsonData = "{\"error\": \"Failed to convert AlertThreshold to JSON\"}";
         }
 
-        // 모든 Emitter에 전송
+        // 모든 Emitter에 브로드캐스트 전송
         for (Map.Entry<String, SseEmitter> entry : emitters.entrySet()) {
             try {
                 entry.getValue().send(jsonData);
@@ -195,4 +200,5 @@ public class ThresholdService {
             }
         }
     }
+
 }

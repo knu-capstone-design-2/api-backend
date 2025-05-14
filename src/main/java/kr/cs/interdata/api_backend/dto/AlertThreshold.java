@@ -15,6 +15,6 @@ public class AlertThreshold {
     private String value;   // 임계값을 넘은 값
 
     //private LocalDateTime timestamp;    // 임계값을 넘은 시각
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime timestamp; // 임계값을 넘은 시각
 }

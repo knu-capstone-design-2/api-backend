@@ -37,6 +37,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation 'com.github.ben-manes.caffeine:caffeine:3.2.0'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3'
 }
 
 tasks.named('test') {

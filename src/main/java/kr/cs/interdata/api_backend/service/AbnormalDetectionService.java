@@ -17,20 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class AbnormalDetectionService {
 
-    // 🚀 Caffeine 캐시 설정: 5분 TTL, 최대 10,000개 엔트리 보관
-    private final Cache<String, Boolean> statusCache = Caffeine.newBuilder()
+    // Caffeine 캐시 설정: 5분 TTL, 최대 10,000개 엔트리 보관
+    /*private final Cache<String, Boolean> statusCache = Caffeine.newBuilder()
             .expireAfterWrite(5, TimeUnit.MINUTES) // 5분이 지나면 자동 삭제
             .maximumSize(10000)                    // 최대 10,000개까지만 보관
-            .build();
-
+            .build();*/
 
     private final AbnormalMetricLogRepository abnormalMetricLogRepository;
     private final LatestAbnormalStatusRepository latestAbnormalStatusRepository;
@@ -86,9 +83,10 @@ public class AbnormalDetectionService {
         }
     }
 
-    //최근 이상 상태 조회 - latestAbnormalStauts
+
     /**
-     * 날짜 기준으로 임계값을 초과한 기록을 조회
+     *  - 최근 이상 상태 조회 - latestAbnormalStauts
+     *      -> 날짜 기준으로 임계값을 초과한 기록을 조회
      * @param targetDate 조회할 날짜 (yyyy-MM-dd)
      * @return 조회된 기록 리스트
      */
@@ -105,12 +103,14 @@ public class AbnormalDetectionService {
     }
 
     /**
-     *  - LatestAbnormalStatus 이상값을 캐시에서 읽어오기
-     * @param targetId
-     * @param metricName
-     * @return
+     *  - LatestAbnormalStatus의 이상값이 정상화되었는지 여부를 캐시에서 조회
+     *    만약 캐시에 존재하지 않으면 DB에서 조회하고, 결과를 캐시에 저장한다.
+     *
+     * @param targetId   이상값이 발생한 대상의 ID (host 또는 container의 고유 ID)
+     * @param metricName 메트릭의 이름 (현재는 cpu, memory, disk, network 중 하나)
+     * @return           정상화 상태 (true: 정상화됨, false: 정상화되지 않음)
      */
-    private boolean isResolved(String targetId, String metricName) {
+    /*private boolean isResolved(String targetId, String metricName) {
         String cacheKey = targetId + "_" + metricName;
 
         // 캐시에서 찾고, 없으면 DB에서 조회 후 캐시에 저장
@@ -121,14 +121,17 @@ public class AbnormalDetectionService {
 
         // 캐시가 null을 반환하면 false로 대체
         return Optional.ofNullable(resolved).orElse(false);
-    }
+    }*/
 
     /**
-     *  - LatestAbnormalStatus 이상값 정상화 처리 메서드
-     * @param targetId
-     * @param metricName
+     *  - LatestAbnormalStatus의 이상값을 정상화 처리하는 메서드
+     *    주어진 targetId와 metricName에 해당하는 데이터를 캐시와 DB에서 조회하고,
+     *    정상화가 확인되면 `resolved` 값을 `true`로 업데이트한다.
+     *
+     * @param targetId   정상화할 대상의 ID (host 또는 container의 고유 ID)
+     * @param metricName 정상화할 메트릭의 이름 (현재는 cpu, memory, disk, network 중 하나)
      */
-    public void resolveIfNormal(String targetId, String metricName) {
+    /*public void resolveIfNormal(String targetId, String metricName) {
         if (!isResolved(targetId, metricName)) {
             Optional<LatestAbnormalStatus> statusOpt = latestAbnormalStatusRepository.findByTargetIdAndMetricName(targetId, metricName);
 
@@ -146,7 +149,7 @@ public class AbnormalDetectionService {
                 }
             }
         }
-    }
+    }*/
 
-    //(선택)1달 이상 지난 로그 삭제 -> 둘 다
+    //(선택)1달 이상 지난 로그 삭제 -> AbnrmalMetricLog
 }

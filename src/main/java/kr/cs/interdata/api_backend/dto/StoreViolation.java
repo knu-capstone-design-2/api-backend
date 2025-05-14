@@ -11,10 +11,10 @@ import lombok.val;
 @Setter
 public class StoreViolation {
 
-    private String targetId;    // 메시지를 보낸 호스트/컨테이너의 머신 id
+    private String machineId;    // 메시지를 보낸 호스트/컨테이너의 머신 id
     private String metricName;  // 메트릭 이름
     private String value;   // 임계값을 넘은 값
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime timestamp; // 임계값을 넘은 시각
 }
