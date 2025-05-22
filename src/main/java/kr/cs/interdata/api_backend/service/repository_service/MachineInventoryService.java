@@ -1,8 +1,9 @@
-package kr.cs.interdata.api_backend.service;
+package kr.cs.interdata.api_backend.service.repository_service;
 
 import kr.cs.interdata.api_backend.entity.MonitoredMachineInventory;
 import kr.cs.interdata.api_backend.entity.TargetType;
 import kr.cs.interdata.api_backend.repository.MonitoredMachineInventoryRepository;
+import kr.cs.interdata.api_backend.repository.TargetTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
+import java.lang.annotation.Target;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -19,10 +21,13 @@ public class MachineInventoryService {
 
     private final Logger logger = LoggerFactory.getLogger(MonitoringDefinitionService.class);
 
+    public final TargetTypeRepository targetTypeRepository;
     public final MonitoredMachineInventoryRepository monitoredMachineInventoryRepository;
 
     @Autowired
-    public MachineInventoryService(MonitoredMachineInventoryRepository monitoredMachineInventoryRepository) {
+    public MachineInventoryService(TargetTypeRepository targetTypeRepository,
+                                   MonitoredMachineInventoryRepository monitoredMachineInventoryRepository) {
+        this.targetTypeRepository = targetTypeRepository;
         this.monitoredMachineInventoryRepository = monitoredMachineInventoryRepository;
     }
 
@@ -53,11 +58,13 @@ public class MachineInventoryService {
 
     // 머신 등록 - add
     public void addMachine(String type, String machine_id) {
-        TargetType targetType = new TargetType();
-        targetType.setType(type);
+        // 이미 DB에 저장된 TargetType을 조회
+        TargetType targetType = targetTypeRepository.findByType(type)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown type: " + type));
 
         MonitoredMachineInventory machine = new MonitoredMachineInventory();
         String id = generateNextId(type);
+        System.out.println("typeid(created) : "+ id);
         machine.setId(id);
         machine.setType(targetType);
         machine.setMachineId(machine_id);
@@ -67,22 +74,37 @@ public class MachineInventoryService {
         logger.info("머신을 성공적으로 등록하였습니다: {} -> {}, {}", id, type, machine_id);
     }
 
-    // type당 고유 id를 순서대로 생성하는 메서드(ex. host001, container002)
+    /**
+     *  - type당 고유 id를 순서대로 생성하는 메서드
+     *      (ex. host001, container002)
+     * @param type  머신의 타입을 구분하는 변수 (ex."host", "container")
+     * @return      생성된 id를 리턴한다.
+     */
     public String generateNextId(String type) {
         Pageable topOne = PageRequest.of(0, 1); // 가장 최근 하나만 가져옴
-        List<String> topIds = monitoredMachineInventoryRepository.findTopIdByType(type, topOne);
 
-        int nextNumber = 1;
-        if (!topIds.isEmpty()) {
-            String lastId = topIds.get(0); // 예: host003
-            String numberPart = lastId.replace(type, ""); // "003"
-            try {
-                nextNumber = Integer.parseInt(numberPart) + 1;
-            } catch (NumberFormatException e) {
-                throw new RuntimeException("id 형식이 잘못되었습니다(ex. host013, container002): " + lastId);
-            }
+        //List<String> topIds = monitoredMachineInventoryRepository.findTopIdByType(type, topOne);
+        // enum 변환
+        TargetType targetType = targetTypeRepository.findByType(type)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown type: " + type));
+        List<String> topIds = monitoredMachineInventoryRepository.findTopIdByType(targetType, topOne);
+
+        // 관련된 ID가 하나도 없으면 001부터 시작
+        if (topIds.isEmpty()) {
+            return String.format("%s%03d", type, 1);
         }
 
+        String lastId = topIds.get(0); // 예: host003
+        String numberPart = lastId.substring(type.length()); // "003"
+        int nextNumber = 1;
+
+        try {
+            nextNumber = Integer.parseInt(numberPart) + 1;
+        } catch (NumberFormatException e) {
+            logger.error("Invalid ID format found: {}. Starting from 001.", lastId);
+            nextNumber = 1; // 형식이 잘못되었을 경우 기본값으로 초기화
+        }
+        logger.info("set Id format number: {}{}", type,nextNumber);
         return String.format("%s%03d", type, nextNumber); // host004
     }
 

@@ -14,12 +14,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/api")
-public class ThresholdController {
+public class WebController {
 
     private final ThresholdService thresholdService;
 
     @Autowired
-    public ThresholdController(ThresholdService thresholdService) {
+    public WebController(ThresholdService thresholdService) {
         this.thresholdService = thresholdService;
     }
 
@@ -38,16 +38,7 @@ public class ThresholdController {
         return ResponseEntity.ok(thresholdService.getThresholdHistory(date));
     }
 
-    @GetMapping("/metrics/threshold-check")
-    public ResponseEntity<?> checkThreshold() {
-        return ResponseEntity.ok(thresholdService.checkThreshold());
-    }
-
-    @PostMapping("/violation-store")
-    public ResponseEntity<?> storeViolation(@RequestBody StoreViolation dto) {
-        return ResponseEntity.ok(thresholdService.storeViolation(dto));
-    }
-
+    // SSE 방식
     @GetMapping("/metrics/threshold-alert")
     public SseEmitter alertThreshold() {
         return thresholdService.alertThreshold();
