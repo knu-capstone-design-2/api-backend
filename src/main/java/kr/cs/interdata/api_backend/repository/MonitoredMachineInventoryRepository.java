@@ -1,6 +1,7 @@
 package kr.cs.interdata.api_backend.repository;
 
 import kr.cs.interdata.api_backend.entity.MonitoredMachineInventory;
+import kr.cs.interdata.api_backend.entity.TargetType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,7 +25,7 @@ public interface MonitoredMachineInventoryRepository extends JpaRepository<Monit
             "FROM MonitoredMachineInventory m " +
             "WHERE m.type = :type AND m.id IS NOT NULL " +
             "ORDER BY m.id DESC")
-    List<String> findTopIdByType(@Param("type") String type, Pageable pageable);
+    List<String> findTopIdByType(@Param("type") TargetType type, Pageable pageable);
 
     // machine id를 통해 id를 반환하는 메서드
     Optional<MonitoredMachineInventory> findByMachineId(String machineId);

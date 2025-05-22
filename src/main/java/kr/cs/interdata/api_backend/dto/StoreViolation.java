@@ -11,6 +11,7 @@ import lombok.val;
 @Setter
 public class StoreViolation {
 
+    private String type;    // 메세지를 보낸 머신의 타입: 호스트, 컨테이너
     private String machineId;    // 메시지를 보낸 호스트/컨테이너의 머신 id
     private String metricName;  // 메트릭 이름
     private String value;   // 임계값을 넘은 값

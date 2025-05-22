@@ -1,7 +1,4 @@
-package kr.cs.interdata.api_backend.service;
-
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+package kr.cs.interdata.api_backend.service.repository_service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class AbnormalDetectionService {
@@ -61,7 +57,7 @@ public class AbnormalDetectionService {
         abnormalMetricLogRepository.save(abn);
 
         // 2. LatestAbnormalStatus 저장 또는 갱신
-        Optional<LatestAbnormalStatus> optional =
+        /*Optional<LatestAbnormalStatus> optional =
                 latestAbnormalStatusRepository.findByTargetIdAndMetricName(id, metric);
 
         if (optional.isPresent()) {
@@ -80,7 +76,7 @@ public class AbnormalDetectionService {
             latest_abn.setDetectedAt(timestamp);
             latest_abn.setResolved(false);
             latestAbnormalStatusRepository.save(latest_abn);
-        }
+        }*/
     }
 
 

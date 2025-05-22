@@ -13,6 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.cs.interdata.api_backend.dto.*;
 import kr.cs.interdata.api_backend.entity.AbnormalMetricLog;
+import kr.cs.interdata.api_backend.service.repository_service.AbnormalDetectionService;
+import kr.cs.interdata.api_backend.service.repository_service.MachineInventoryService;
+import kr.cs.interdata.api_backend.service.repository_service.MonitoringDefinitionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,13 +123,14 @@ public class ThresholdService {
      */
     public Object storeViolation(StoreViolation dto) {
         //이상값이 생긴 로그를 저장한다.
+        String type = dto.getType();
         String machineId = dto.getMachineId();
         String metricName = dto.getMetricName();
         String value = dto.getValue();
         LocalDateTime timestamp = dto.getTimestamp();
 
         // machine_id로 넘어온 id를 고유id로 바꿔 저장한다.
-        String targetId = machineInventoryService.changeMachineIdToTargetId(machineId);
+        String targetId = machineInventoryService.changeMachineIdToTargetId(type, machineId);
 
         abnormalDetectionService.storeViolation(
                 targetId,
