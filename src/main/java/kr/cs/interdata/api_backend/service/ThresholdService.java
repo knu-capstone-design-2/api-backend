@@ -205,4 +205,11 @@ public class ThresholdService {
         }
     }
 
+    //test
+    public Object hello() {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "hello!");
+        return response;
+    }
+
 }

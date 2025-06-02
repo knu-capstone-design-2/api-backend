@@ -44,4 +44,9 @@ public class WebController {
         return thresholdService.alertThreshold();
     }
 
+
+    @GetMapping("/hello")
+    public ResponseEntity<?> hello() {
+        return ResponseEntity.ok(thresholdService.hello());
+    }
 }
