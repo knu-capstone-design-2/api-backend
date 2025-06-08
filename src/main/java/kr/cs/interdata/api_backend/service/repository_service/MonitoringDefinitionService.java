@@ -52,7 +52,7 @@ public class MonitoringDefinitionService {
     }
 
     /**
-     * 특정 타입의 메트릭 임계값을 ThresholdSetting으로 매핑하여 조회
+     *  - 특정 타입의 메트릭 임계값을 ThresholdSetting으로 매핑하여 조회
      *
      * @param typeName "host" 또는 "container"와 같은 타입명
      * @return ThresholdSetting 객체
@@ -103,7 +103,7 @@ public class MonitoringDefinitionService {
     }
 
     /**
-     * 모든 타입의 모든 메트릭 임계값을 조회하여 Map 형태로 반환
+     *  - 모든 타입의 모든 메트릭 임계값을 조회하여 Map 형태로 반환
      *
      * @return Map<type(String), Map<metric_name(String), threshold(Double)>> resultMap
      */

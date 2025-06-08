@@ -17,6 +17,22 @@ public class InventoryService {
 
     private final Logger logger = LoggerFactory.getLogger(InventoryService.class);
 
+    /**
+     *  - 주어진 machineId와 type에 대해 고유한 targetId를 반환한다.
+     *
+     * <p>동작 순서:
+     * <ol>
+     *   <li>먼저 캐시(inventoryCache)에서 machineId에 해당하는 targetId를 조회한다.</li>
+     *   <li>캐시에 존재하면 해당 targetId를 반환한다.</li>
+     *   <li>캐시에 없으면 DB에서 조회 및 필요 시 id를 생성하여 targetId를 획득한다.</li>
+     *   <li>새로 조회/생성한 targetId를 캐시에 저장한다.</li>
+     *   <li>최종적으로 targetId를 반환한다.</li>
+     * </ol>
+     *
+     * @param machineId 고유 id를 생성하거나 조회할 대상 machine의 ID
+     * @param type      대상 machine의 타입
+     * @return  machineId와 type에 해당하는 고유한 targetId
+     */
     public String getOrGenerateUniqueId(String machineId, String type) {
         // 1. Cache에서 먼저 조회
         String targetId = inventoryCache.getIfPresent(machineId);
