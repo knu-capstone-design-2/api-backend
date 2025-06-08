@@ -11,8 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-
-import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,14 +30,15 @@ public class MachineInventoryService {
     }
 
     /**
-     * machineId를 기반으로 MonitoredMachineInventory 테이블에서 조회하여
-     * targetId (해당 엔티티의 id 값)를 반환한다.
-     * 조회 결과가 없을 경우 addMachine(String type, String machine_id)를 호출하여
-     * DB에 추가한 후 생성된 id를 반환한다.
+     * machineId를 기반으로 MonitoredMachineInventory 테이블에서 해당 엔티티의 id(targetId)를 조회하여 반환한다.
+     * <p>
+     * 조회 결과가 없을 경우 {@link #addMachine(String, String)}을 호출하여 DB에 추가한 후,
+     * 생성된 id를 반환한다.
+     * </p>
      *
-     * @param type 추가할 machine의 타입
-     * @param machineId 조회할 machine의 고유 ID
-     * @return 해당 machine의 targetId (없으면 add 후 생성된 id 반환)
+     * @param type      추가 또는 조회할 머신의 타입
+     * @param machineId 조회 또는 추가할 머신의 고유 ID
+     * @return 해당 머신의 targetId (존재하지 않으면 추가 후 생성된 id 반환)
      */
     public String changeMachineIdToTargetId(String type, String machineId) {
         // machineId를 기반으로 MonitoredMachineInventory 조회
@@ -56,7 +55,23 @@ public class MachineInventoryService {
                 });
     }
 
-    // 머신 등록 - add
+    /**
+     *  - 새로운 머신(MonitoredMachineInventory)을 등록한다.
+     *
+     * <p>
+     * 동작 과정:
+     * <ol>
+     *   <li>입력받은 type에 해당하는 TargetType 엔티티를 조회한다.</li>
+     *   <li>새로운 MonitoredMachineInventory 엔티티를 생성하고, 고유 id를 생성하여 할당한다.</li>
+     *   <li>machineId와 type을 엔티티에 설정한다.</li>
+     *   <li>DB에 저장한다.</li>
+     * </ol>
+     * </p>
+     *
+     * @param type      등록할 머신의 타입
+     * @param machine_id 등록할 머신의 고유 ID
+     * @throws IllegalArgumentException type에 해당하는 TargetType이 존재하지 않을 경우 발생
+     */
     public void addMachine(String type, String machine_id) {
         // 이미 DB에 저장된 TargetType을 조회
         TargetType targetType = targetTypeRepository.findByType(type)

@@ -7,9 +7,9 @@ import lombok.Setter;
 @Setter
 public class ThresholdSetting {
 
-    private String cpuPercent;
-    private String memoryPercent;
-    private String diskPercent;
-    private String networkTraffic;
+    private String cpuPercent;  // cpu의 threshold
+    private String memoryPercent;   // memory의 threshold
+    private String diskPercent;     // disk의 threshold
+    private String networkTraffic;  // network의 threshold
 
 }
