@@ -8,3 +8,4 @@ build
 Thumbs.db
 out
 test-output
+db/mysql/data/**

@@ -32,14 +32,14 @@ public class DataInitializer implements CommandLineRunner {
 
         // 이미 저장된 메트릭은 중복 방지
         insertMetricIfNotExists(hostType, "cpu", "%", 85.0);
-        insertMetricIfNotExists(hostType, "memory", "bytes", 12700000000.0);
-        insertMetricIfNotExists(hostType, "disk", "bytes", 30000000.0);
-        insertMetricIfNotExists(hostType, "network", "bytes", 40000.0);
+        insertMetricIfNotExists(hostType, "memory", "bytes", 20000000000.0);
+        insertMetricIfNotExists(hostType, "disk", "bytes", 40000000.0);
+        insertMetricIfNotExists(hostType, "network", "bytes", 300000.0);
 
         insertMetricIfNotExists(containerType, "cpu", "%", 0.85);
-        insertMetricIfNotExists(containerType, "memory", "bytes", 12700000000.0);
-        insertMetricIfNotExists(containerType, "disk", "bytes", 30000000.0);
-        insertMetricIfNotExists(containerType, "network", "bytes", 6000.0);
+        insertMetricIfNotExists(containerType, "memory", "bytes", 20000000000.0);
+        insertMetricIfNotExists(containerType, "disk", "bytes", 40000000.0);
+        insertMetricIfNotExists(containerType, "network", "bytes", 300000.0);
     }
 
     /**
