@@ -40,3 +40,4 @@ out/
 .env
 /src/main/resources/properties/env.properties
 env.properties
+db/mysql/data/
